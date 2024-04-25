@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox {
+            margin-right: 10px;
+            accent-color: green;
+        }
+
+        .task-title {
+            flex-grow: 1;
+            font-weight: bold;
+        }
+
+        .task-date {
+            font-size: small;
+        }
+
+        .delete-button {
+            color: black;
+            border: none;
+            margin-left: 5%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .priority {
+            margin-right: 10px;
+        }
+
+        .low {
+            color: green;
+            visibility: hidden
+        }
+
+        .medium {
+            color: orange;
+        }
+
+        .high {
+            color: red;
+        }
+        .pagination {
+            display: flex;
+            justify-content: left;
+            padding: 5px 0;
+        }
+
+        .pagination li {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination li:hover {
+            background-color: #ddd;
+        }
+
+        .pagination li.active {
+            background-color: black;
+            color: black;
+        }
+        
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .overlay-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: black;
+        }
+
+        .close-btn:hover {
+            color: red;
+        }
+
+        .overlay-content p {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        select,
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 0px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: calc(100% - 20px);
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+
+            color: red;
+
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="overlay" class="overlay">
+        <div class="overlay-content">
+            <span class="close-btn">×</span>
+            <h2>Insert new task</h2>
+            <form id="taskForm">
+                <label for="title">Title:</label><br>
+                <input type="text" id="title" name="title" required>
+                <span id="titleError" class="error-message"></span><br><br>
+                <label for="description">Description:</label><br>
+                <textarea id="description" name="description" rows="4" cols="50" required></textarea>
+                <span id="descriptionError" class="error-message"></span><br><br>
+                <label for="priority">Priority:</label><br>
+                <select id="priority" name="priority" required>
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                </select>
+                <span id="priorityError" class="error-message"></span><br><br>
+                <label for="date">Date:</label><br>
+                <input type="datetime-local" id="date" name="date" required>
+                <span id="dateError" class="error-message"></span><br><br>
+                <label for="category">Category:</label><br>
+                <select id="category" name="category">
+                    <option value="WORK">Work</option>
+                    <option value="PERSONAL">Personal</option>
+                    <option value="OTHER">Other</option>
+                </select>
+                <input type="submit" value="Submit" text="ADD">
+            </form>
+
+        </div>
+    </div>
+    <h1>To-Do List</h1>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search tasks...">
+    </div>
+    <button id="new-btn">Insert new task</button>
+    <ul id="todoList">
+        <!-- To-Do items will be added here dynamically -->
+    </ul>
+
+    <ul class="pagination">
+        <!-- Pagination links will go here -->
+    </ul>
+</div>
+
+<script>
+    let page = 1;
+    function generatePagination(totalPages){
+        $('.pagination').empty();
+
+        for (var i = 1; i <= totalPages; i++) {
+            $('.pagination').append('<li class="page-item">' + i + '</li>');
+        }
+
+    };
+
+    function fetchData(searchTerm = "", page) {
+        $.ajax({
+            url: "/rest/api/v0/tasks/"+page+"?searchterm="+searchTerm,
+            type: "GET",
+            dataType: "json",
+            success: function (response){
+                appendData(response.content, response.totalPages);
+            },
+            error: function(){
+                alert("There was an error fetching your list");
+            }
+        })
+    }
+
+    function updateTaskStatus(id, status){
+        $.ajax({
+            url: "/rest/api/v0/task/"+id+"/status?status="+status,
+            type: "PUT",
+            success: function (){
+                console.log("success");
+                console.log("QUESTO E ID"+id);
+                alert("Status changed successfully!")
+
+            },
+            error: function(error){
+                console.log("error");
+                console.log(error.responseText);
+                alert(error.responseText);
+            }
+        })
+    }
+
+    function deleteTask(id){
+        $.ajax({
+            url: "/rest/api/v0/task/"+id,
+            type: "DELETE",
+            success: function (){
+                console.log("success");
+                console.log("QUESTO E ID"+id);
+                $('#' + id).remove();
+                alert("Removed successfully!")
+
+            },
+            error: function(error){
+                console.log("error");
+                console.log(error.responseText);
+                alert(error.responseText);
+            }
+        })
+    }
+
+    function appendData(array, totalPages){
+        var todoList = document.getElementById("todoList");
+        todoList.innerHTML = ""; // Clear existing list
+
+        array.forEach(function(task, index){
+            var li = document.createElement("li");
+            li.id = task.id;
+            let status;
+            if(task.isChecked){
+                status = 'checked';
+            }
+            li.innerHTML = `
+                <input type="checkbox" class="checkbox" name="task${index}" data-task-id=${task.id} ${status}>
+                <span class="priority ${task.priority.toLowerCase()}">&#x26A0;</span>
+                <label for="task${index}" class="task-title">${task.title}</label>
+                <span class="task-date">${task.date}</span>
+                <button class="delete-button" data-task-id=${task.id}>x</button>            `;
+
+            todoList.appendChild(li);
+
+        });
+        generatePagination(totalPages);
+    }
+
+    $(document).ready(function(){
+        let searchTerm = $("#searchInput").val();
+        fetchData(searchTerm, page);
+
+        $(document).on('click', '.delete-button', function(){
+            let taskId = $(this).data('task-id');
+            console.log("QUESTO E' IL TASK"+taskId);
+            deleteTask(taskId);
+        });
+
+        $(document).on('click', '.page-item', function(){
+            console.log("click registered");
+            page = $(this).text();
+            searchTerm = $("#searchInput").val();
+            fetchData(searchTerm, page);
+        });
+
+        $(document).on('change', '.checkbox', function(){
+            let taskId = $(this).data('task-id');
+            console.log("QUESTO E' IL TASK"+taskId);
+            let status =  $(this).is(':checked');
+            updateTaskStatus(taskId, status);
+        });
+
+
+        $("#searchInput").on('input', function(){
+            let searchTerm = $(this).val();
+            fetchData(searchTerm, page);
+        });
+
+        $(".close-btn").on('click', function(){
+            $(".overlay").hide();
+        });
+
+        $("#new-btn").on('click', function(){
+            $(".overlay").show();
+        });
+
+        $("#taskForm").on('submit', function(event){
+            event.preventDefault();
+            const formData = new FormData(this);
+            const json = {};
+            formData.forEach((value, key) =>{
+                json[key] = value;
+            });
+            clearErrors();
+            $.ajax({
+                type: "POST",
+                url: "rest/api/v0/task",
+                contentType: "application/json",
+                data: JSON.stringify(json),
+                success: function (){
+                    alert("Task Successfully added");
+                    let searchTerm = $("#searchInput").val();
+                    fetchData(searchTerm, page);
+                },
+                error: function(xhr, status, error){
+                    if(xhr.status === 422){
+                        const errors = xhr.responseJSON;
+                        for (const field in errors) {
+                            const errorMessage = errors[field];
+                            displayErrorMessage(field, errorMessage);
+                        }
+                    }
+                    else{
+                            alert("An error occured, couldn't create your task")
+                    }
+                }
+            })
+
+        });
+
+        function displayErrorMessage(field, errorMessage) {
+            const errorElement = document.getElementById(`${field}Error`);
+            if (errorElement) {
+                errorElement.textContent = errorMessage;
+            }
+        }
+
+        function clearErrors(){
+            $(".error-message").text("");
+        }
+    });
+
+
+</script>
+
+</body>
+</html>

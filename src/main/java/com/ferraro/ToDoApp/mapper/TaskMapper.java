@@ -3,6 +3,7 @@ package com.ferraro.ToDoApp.mapper;
 import com.ferraro.ToDoApp.dto.TaskDTO;
 import com.ferraro.ToDoApp.dto.TaskRequest;
 import com.ferraro.ToDoApp.entities.Task;
+import com.ferraro.ToDoApp.enums.Priority;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,8 +19,14 @@ public class TaskMapper {
         if (request.getDescription() != null) {
             task.setDescription(request.getDescription());
         }
-        task.setPriority(request.getPriority());
+        if(request.getPriority() != null) {
+            task.setPriority(request.getPriority());
+        }
+        else{
+            task.setPriority(Priority.LOW);
+        }
         task.setDate(request.getDate());
+        task.setIsChecked(false);
         if (request.getDate() != null) {
             task.setCategory(request.getCategory());
         }

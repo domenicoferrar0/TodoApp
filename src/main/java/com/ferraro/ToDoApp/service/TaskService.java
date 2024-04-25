@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class TaskService {
@@ -40,9 +41,9 @@ public class TaskService {
         return true;
     }
 
-    public TaskDTO checkTask(Long id){
+    public TaskDTO checkTask(Long id, boolean status){
         Task task = findById(id);
-        task.setIsChecked(true);
+        task.setIsChecked(status);
         return mapper.taskToDto(repository.save(task));
     }
 
@@ -56,7 +57,7 @@ public class TaskService {
     }
 
     public Page<TaskDTO> allTasks(int page, int pageSize){
-        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by("date").descending());
+        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by("date"));
         return repository.findAll(pageable)
                 .map(mapper::taskToDto);
     }
@@ -65,13 +66,16 @@ public class TaskService {
       if(category == null && isChecked == null && priority == null) {
           return allTasks(page, pageSize);
       }
-        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by("date").descending());
+        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by("date"));
         return repository.findAllBy(priority, category, isChecked, pageable)
                 .map(mapper::taskToDto);
     }
 
     public Page<TaskDTO> taskBySearchterm(int page, int pageSize, String search){
-        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by("date").descending());
+        if(!StringUtils.hasText(search)){
+            return allTasks(page, pageSize);
+        }
+        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by("date"));
         return repository.findBySearch(search, pageable)
                 .map(mapper::taskToDto);
     }

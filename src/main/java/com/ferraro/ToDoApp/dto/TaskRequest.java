@@ -20,20 +20,18 @@ import java.time.LocalDateTime;
 @Setter
 public class TaskRequest {
 
-    @Size(min = 1, max = 100)
-    @NotBlank
+    @Size(min = 1, max = 100, message = "Title surpassed the limit of 100 characters")
+    @NotBlank(message = "Title cannot be empty")
     private String title;
 
-    @Size(min = 1, max = 500)
+    @Size(min = 1, max = 500, message = "Description surpassed the limit of 500 characters")
     private String description;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
-    @NotNull
-    @FutureOrPresent
-    @Column(columnDefinition = "TIMESTAP")
+    @NotNull(message = "Insert a proper date")
+    @FutureOrPresent(message = "Date not valid, it cannot be in past")
     private LocalDateTime date;
 
 

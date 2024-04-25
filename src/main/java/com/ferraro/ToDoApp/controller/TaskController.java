@@ -20,7 +20,7 @@ public class TaskController {
     @Autowired
     private TaskService service;
 
-    private final int pageSize = 10;
+    private final int pageSize = 4;
 
     @PostMapping("/task")
     public ResponseEntity<TaskDTO> newTask(@Valid @NonNull @RequestBody TaskRequest request){
@@ -49,12 +49,12 @@ public class TaskController {
         return ResponseEntity.ok(service.editTask(id, request));
     }
 
-    @GetMapping("/tasks/{page}")
-    public ResponseEntity<Page<TaskDTO>> findAllTasks(@PathVariable("page") int page){
-        return ResponseEntity.ok(service.allTasks(page, pageSize));
+    @PutMapping("/task/{id}/status")
+    public ResponseEntity<TaskDTO>checkTask(@PathVariable("id") Long id, @RequestParam("status") boolean status){
+        return ResponseEntity.ok(service.checkTask(id, status));
     }
 
-    @GetMapping("/tasks/{page}")
+    @GetMapping("/tasks/filter/{page}")
     public ResponseEntity<Page<TaskDTO>> findAllTasksByParams(@PathVariable("page") int page,
                                                               @RequestParam("category") Category category,
                                                               @RequestParam("priority")Priority priority,
@@ -64,7 +64,9 @@ public class TaskController {
 
     @GetMapping("/tasks/{page}")
     public ResponseEntity<Page<TaskDTO>> findAllTasksBySearchterm(@PathVariable("page") int page,
-                                                                  @RequestParam("searchterm")String searchterm){
+                                                                  @RequestParam(value = "searchterm", required = false)String searchterm){
+        System.out.println("ENDPOINT"+System.currentTimeMillis());
+
         return ResponseEntity.ok(service.taskBySearchterm(page, pageSize, searchterm));
     }
 

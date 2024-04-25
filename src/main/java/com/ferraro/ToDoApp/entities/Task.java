@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -37,7 +38,7 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
-    @Column(columnDefinition = "TIMESTAP")
+    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)
