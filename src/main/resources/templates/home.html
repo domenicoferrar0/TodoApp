@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title>To-Do List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
         }
 
         .container {
@@ -18,10 +18,13 @@
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             text-align: center;
+            color: #333;
         }
 
         .search-bar {
@@ -57,14 +60,17 @@
         .task-title {
             flex-grow: 1;
             font-weight: bold;
+            cursor: pointer;
+            color: #333;
         }
 
         .task-date {
             font-size: small;
+            color: #666;
         }
 
         .delete-button {
-            color: black;
+            color: #666;
             border: none;
             margin-left: 5%;
             border-radius: 5px;
@@ -73,16 +79,17 @@
         }
 
         .delete-button:hover {
-            background-color: #c82333;
+            background-color: #f1f1f1;
         }
 
         .priority {
             margin-right: 10px;
+            color: #333;
         }
 
         .low {
             color: green;
-            visibility: hidden
+            visibility: hidden;
         }
 
         .medium {
@@ -113,9 +120,9 @@
 
         .pagination li.active {
             background-color: black;
-            color: black;
+            color: white;
         }
-        
+
 
         .overlay {
             display: none;
@@ -161,6 +168,7 @@
 
         label {
             font-weight: bold;
+            color: #333;
         }
 
         input[type="text"],
@@ -174,6 +182,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+            font-size: 16px;
         }
 
         textarea {
@@ -197,15 +206,58 @@
         }
 
         .error-message {
-
             color: red;
-
             text-align: center;
         }
+        .task-info {
+            display: none;
+            flex-direction: column;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
+        }
+        .category {
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            display: block;
+            color: #666;
+        }
+        .description {
+            font-size: 14px;
+            color: #333;
+        }
 
-    </style>
+        #new-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        #new-btn:hover {
+            background-color: #45a049;
+        }
+
+        .filter {
+            display: flex;
+            flex-direction: column;
+            align-items: horizontal;
+            width: 18%;
+        }
+    </style>>
 </head>
 <body>
+
+
 <div class="container">
     <div id="overlay" class="overlay">
         <div class="overlay-content">
@@ -232,6 +284,8 @@
                 <select id="category" name="category">
                     <option value="WORK">Work</option>
                     <option value="PERSONAL">Personal</option>
+                    <option value="SHOPPING">Shopping</option>
+                    <option value="STUDY">Study</option>
                     <option value="OTHER">Other</option>
                 </select>
                 <input type="submit" value="Submit" text="ADD">
@@ -247,6 +301,7 @@
     <button id="new-btn">Insert new task</button>
     <ul id="todoList">
         <!-- To-Do items will be added here dynamically -->
+
     </ul>
 
     <ul class="pagination">
@@ -330,12 +385,20 @@
             li.innerHTML = `
                 <input type="checkbox" class="checkbox" name="task${index}" data-task-id=${task.id} ${status}>
                 <span class="priority ${task.priority.toLowerCase()}">&#x26A0;</span>
-                <label for="task${index}" class="task-title">${task.title}</label>
+                <label for="task${index}" class="task-title" data-task-id=${task.id}>${task.title}</label>
                 <span class="task-date">${task.date}</span>
-                <button class="delete-button" data-task-id=${task.id}>x</button>            `;
+                <button class="delete-button" data-task-id=${task.id}>x</button>
+                         `;
+            var taskInfo = document.createElement("div");
+            taskInfo.classList.add("task-info");
+            taskInfo.id = "info" + task.id;
+            taskInfo.innerHTML = `
+                <span class="category">${task.category}</span>
+                <span class="description">${task.description}</span>
+    `;
 
             todoList.appendChild(li);
-
+            todoList.appendChild(taskInfo);
         });
         generatePagination(totalPages);
     }
@@ -378,6 +441,17 @@
             $(".overlay").show();
         });
 
+        $(document).on('click', '.task-title', function(){
+            console.log("CLICK");
+            let id = $(this).data('task-id');;
+            if($("#info"+id).is(":hidden")){
+                $("#info"+id).show();
+            }
+            else {
+                $("#info"+id).hide();
+            }
+        });
+
         $("#taskForm").on('submit', function(event){
             event.preventDefault();
             const formData = new FormData(this);
@@ -405,7 +479,7 @@
                         }
                     }
                     else{
-                            alert("An error occured, couldn't create your task")
+                        alert("An error occured, couldn't create your task")
                     }
                 }
             })
